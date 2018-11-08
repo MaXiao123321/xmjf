@@ -1,3 +1,14 @@
 # Created by .ignore support plugin (hsz.mobi)
 /.idea/
 /shsxt_xmjf_admin/shsxt_xmjf_admin.iml
+/shsxt_xmjf_code/shsxt_xmjf_code.iml
+/shsxt_xmjf_api/shsxt_xmjf_api.iml
+/shsxt_xmjf_commons/shsxt_xmjf_commons.iml
+/shsxt_xmjf_server/shsxt_xmjf_server.iml
+/shsxt_xmjf_par.iml
+shsxt_xmjf_api/src/test/
+shsxt_xmjf_api/target/
+shsxt_xmjf_code/src/test/
+shsxt_xmjf_commons/src/test/
+shsxt_xmjf_server/target/
+shsxt_xmjf_web/target/
