@@ -1,17 +1,9 @@
 package com.shsxt.xmjf.server.db.dao;
 
 import com.shsxt.xmjf.api.po.BasUser;
+import com.shsxt.xmjf.server.base.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
-public interface BasUserMapper {
-    int deleteByPrimaryKey(Integer id);
-
-    int insert(BasUser record);
-
-    int insertSelective(BasUser record);
-
-    BasUser selectByPrimaryKey(Integer id);
-
-    int updateByPrimaryKeySelective(BasUser record);
-
-    int updateByPrimaryKey(BasUser record);
+public interface BasUserMapper extends BaseMapper<BasUser> {
+    public BasUser queryBasUserByPhone(@Param("phone") String phone);
 }

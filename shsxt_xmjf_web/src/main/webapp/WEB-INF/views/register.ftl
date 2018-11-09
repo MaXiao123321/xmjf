@@ -29,8 +29,8 @@
                 <div class="box-input-center">
                     <p class="login_input_wrap"><input placeholder="手机号" type="text" id="phone" class="login-input1" /></p>
                     <p class="login_input_code">
-                        <input id="code" placeholder="请输入验证码" type="text"  class="login-input login-check-code"/>
-                        <img class="validImg" alt="点击更换" title="点击更换" src="${ctx}/img/getPictureVerifyImage"/>
+                        <input name="code" placeholder="请输入验证码" type="text"  class="login-input login-check-code"/>
+                        <img class="validImg" alt="点击更换" title="点击更换" src="${ctx}/image"/>
                     </p>
                     <p class="login_input_password">
                         <input type="text" id="verification" placeholder="请输入验证码" class="login-input-verification"/>

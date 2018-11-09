@@ -21,29 +21,13 @@
     id, username, password, salt, status, mobile, email, type, last_login_ip, last_login_time, 
     referer, addtime, addip, time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="queryById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from bas_user
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from bas_user
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
-  <insert id="insert" parameterType="com.shsxt.xmjf.api.po.BasUser" >
-    insert into bas_user (id, username, password, 
-      salt, status, mobile, 
-      email, type, last_login_ip, 
-      last_login_time, referer, addtime, 
-      addip, time)
-    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{salt,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{mobile,jdbcType=VARCHAR}, 
-      #{email,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{lastLoginIp,jdbcType=VARCHAR}, 
-      #{lastLoginTime,jdbcType=TIMESTAMP}, #{referer,jdbcType=VARCHAR}, #{addtime,jdbcType=TIMESTAMP}, 
-      #{addip,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP})
-  </insert>
-  <insert id="insertSelective" parameterType="com.shsxt.xmjf.api.po.BasUser" >
+  <insert id="insert" parameterType="com.shsxt.xmjf.api.po.BasUser" keyProperty="id" useGeneratedKeys="true" >
     insert into bas_user
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -134,7 +118,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.shsxt.xmjf.api.po.BasUser" >
+  <update id="update" parameterType="com.shsxt.xmjf.api.po.BasUser" >
     update bas_user
     <set >
       <if test="username != null" >
@@ -179,21 +163,12 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.shsxt.xmjf.api.po.BasUser" >
-    update bas_user
-    set username = #{username,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
-      salt = #{salt,jdbcType=VARCHAR},
-      status = #{status,jdbcType=INTEGER},
-      mobile = #{mobile,jdbcType=VARCHAR},
-      email = #{email,jdbcType=VARCHAR},
-      type = #{type,jdbcType=INTEGER},
-      last_login_ip = #{lastLoginIp,jdbcType=VARCHAR},
-      last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
-      referer = #{referer,jdbcType=VARCHAR},
-      addtime = #{addtime,jdbcType=TIMESTAMP},
-      addip = #{addip,jdbcType=VARCHAR},
-      time = #{time,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
+  <!--通过电话查询有无此用户-->
+  <select id="queryBasUserByPhone" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from bas_user
+    where mobile=#{phone} and status=1
+  </select>
+
 </mapper>

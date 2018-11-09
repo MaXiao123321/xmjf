@@ -83,6 +83,42 @@
     </bean>
 
 
+    <!--
+       redis 配置
+    -->
+    <!-- 连接池配置 -->
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!-- 最大连接数  -->
+        <property name="maxTotal" value="${redis.poolConfig.maxTotal}"/>
+        <!-- 最大 空闲连接数 -->
+        <property name="maxIdle" value="${redis.poolConfig.maxIdle}"/>
+        <!-- 获取连接时最大等待毫秒数 -->
+        <property name="maxWaitMillis" value="${redis.poolConfig.maxWaitMillis}"/>
+        <!-- 在获取连接时检查有效性 -->
+        <property name="testOnBorrow" value="${redis.poolConfig.testOnBorrow}"/>
+    </bean>
+
+    <!-- 客户端连接工厂 -->
+    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"  p:usePool="true"  >
+        <property name="hostName" value="${redis.host.name}"></property>
+        <property name="port" value="${redis.host.port}"></property>
+        <property name="password" value="${redis.host.password}"></property>
+        <constructor-arg name="poolConfig" ref="jedisPoolConfig"></constructor-arg>
+    </bean>
+
+    <!--
+      redisTemplate 模板类配置
+    -->
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" p:connection-factory-ref="jedisConnectionFactory">
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"></bean>
+        </property>
+        <property name="valueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"></bean>
+        </property>
+    </bean>
+
+
 
     <!--
        dubbo 环境配置
@@ -94,7 +130,6 @@
     <dubbo:protocol name="dubbo" port="20880"></dubbo:protocol>
 
     <dubbo:service interface="com.shsxt.xmjf.api.service.IUserService" ref="userServiceImpl"></dubbo:service>
-
-
+    <dubbo:service interface="com.shsxt.xmjf.api.service.ISmsService" ref="smsServiceImpl"></dubbo:service>
 
 </beans>
