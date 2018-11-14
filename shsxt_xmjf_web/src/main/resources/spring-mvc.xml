@@ -84,6 +84,7 @@
     <dubbo:registry address="zookeeper://127.0.0.1:2181"></dubbo:registry>
     <dubbo:reference interface="com.shsxt.xmjf.api.service.IUserService" id="userService" timeout="20000"></dubbo:reference>
     <dubbo:reference interface="com.shsxt.xmjf.api.service.ISmsService" id="smsService"></dubbo:reference>
-
+    <dubbo:reference interface="com.shsxt.xmjf.api.service.IBasItemService" id="basItemService"></dubbo:reference>
+    <dubbo:reference interface="com.shsxt.xmjf.api.service.IAccountService" id="accountService"></dubbo:reference>
 
 </beans>

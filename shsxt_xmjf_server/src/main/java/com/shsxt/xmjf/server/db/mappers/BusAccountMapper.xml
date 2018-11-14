@@ -102,4 +102,10 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="queryBusAccountByUserId" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List"/>
+    from bus_account
+     where user_id=#{userId}
+  </select>
 </mapper>

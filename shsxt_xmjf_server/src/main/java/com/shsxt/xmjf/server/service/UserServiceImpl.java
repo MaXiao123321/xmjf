@@ -3,6 +3,7 @@ package com.shsxt.xmjf.server.service;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.shsxt.xmjf.api.constants.XmjfConstant;
+import com.shsxt.xmjf.api.model.UserModel;
 import com.shsxt.xmjf.api.po.*;
 import com.shsxt.xmjf.api.service.IUserService;
 import com.shsxt.xmjf.api.utils.AssertUtil;
@@ -13,6 +14,7 @@ import com.shsxt.xmjf.server.base.BaseMapper;
 import com.shsxt.xmjf.server.db.dao.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -43,10 +45,13 @@ public class UserServiceImpl implements IUserService {
     @Resource
     private SysLogMapper sysLogMapper;
 
+    @Resource(name = "redisTemplate")
+    private ValueOperations valueOperations;
+
     @Resource
     private BusAccountMapper busAccountMapper;
 
-    @Override
+    /*@Override
     public User queryUserByUserId(Integer userId) {
         return userDao.queryUserByUserId(userId);
     }
@@ -54,6 +59,51 @@ public class UserServiceImpl implements IUserService {
     @Override
     public BasUser queryBasUserByPhone(String phone) {
         return basUserMapper.queryBasUserByPhone(phone);
+    }*/
+
+
+    @Override
+    public User queryUserByUserId(Integer userId) {
+       /*
+         * 加入redis 缓存
+         *   缓存添加实现思路
+         *     先到redis 查询缓存
+         *       存在   获取缓存数据
+         *       不存在
+         *           查询数据库记录
+         *             存在:存储数据到redis 缓存*/
+
+        String key = "user::userId::"+userId;
+        User user = (User) valueOperations.get(key);
+        if(null==user){
+            user = userDao.queryUserByUserId(userId);
+            if(user!=null){
+                valueOperations.set(key,user);
+            }
+        }
+        return user;
+    }
+    @Override
+    public BasUser queryBasUserByPhone(String phone) {
+        /*
+         * 加入redis 缓存
+         *   缓存添加实现思路
+         *     先到redis 查询缓存
+         *       存在   获取缓存数据
+         *       不存在
+         *           查询数据库记录
+         *             存在:存储数据到redis 缓存
+         */
+
+        String key="user::phone::"+phone;
+        BasUser basUser= (BasUser) valueOperations.get(key);
+        if(null==basUser){
+            basUser = basUserMapper.queryBasUserByPhone(phone);
+            if(null!=basUser){
+                valueOperations.set(key,basUser);
+            }
+        }
+        return basUser;
     }
 
     /**
@@ -111,6 +161,44 @@ public class UserServiceImpl implements IUserService {
         //2-8 sys_log     系统日志
         initSysLog(userId);
 
+    }
+
+    /**
+     * 登录操作
+     * @param phone 手机号
+     * @param password 密码
+     * @return
+     */
+    @Override
+    public UserModel login(String phone, String password) {
+        AssertUtil.isTrue(StringUtils.isBlank(phone),"请输入手机号");
+        AssertUtil.isTrue(!(PhoneUtil.checkPhone(phone)),"手机号不合法");
+        AssertUtil.isTrue(StringUtils.isBlank(password),"密码不能为空");
+        BasUser basUser = queryBasUserByPhone(phone);
+        AssertUtil.isTrue(null==basUser,"该手机号未注册,请先执行注册!");
+        AssertUtil.isTrue(!(basUser.getPassword().equals(MD5.toMD5(password+basUser.getSalt()))),"密码不正确");
+        UserModel userModel=new UserModel();
+        userModel.setUserName(basUser.getUsername());
+        userModel.setUserId(basUser.getId());
+        userModel.setMobile(basUser.getMobile());
+        return userModel;
+    }
+
+    @Override
+    public UserModel quickLogin(String phone, String code) {
+        AssertUtil.isTrue(StringUtils.isBlank(phone),"请输入手机号");
+        AssertUtil.isTrue(!(PhoneUtil.checkPhone(phone)),"手机号不合法");
+        AssertUtil.isTrue(StringUtils.isBlank(code),"验证码不能为空");
+        String key="phone::"+phone+"::type::"+ XmjfConstant.SMS_LOGIN_TYPE;
+        AssertUtil.isTrue(!(redisTemplate.hasKey(key)),"验证码不存在或已过期!");
+        BasUser basUser =queryBasUserByPhone(phone);
+        AssertUtil.isTrue(null==basUser,"该手机号未注册,请先执行注册!");
+        UserModel userModel=new UserModel();
+        userModel.setUserName(basUser.getUsername());
+        userModel.setUserId(basUser.getId());
+        userModel.setMobile(basUser.getMobile());
+
+        return userModel;
     }
 
     private void initSysLog(int userId) {

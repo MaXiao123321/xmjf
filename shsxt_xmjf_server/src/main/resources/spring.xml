@@ -131,5 +131,6 @@
 
     <dubbo:service interface="com.shsxt.xmjf.api.service.IUserService" ref="userServiceImpl"></dubbo:service>
     <dubbo:service interface="com.shsxt.xmjf.api.service.ISmsService" ref="smsServiceImpl"></dubbo:service>
-
+    <dubbo:service interface="com.shsxt.xmjf.api.service.IBasItemService" ref="basItemServiceImpl"></dubbo:service>
+    <dubbo:service interface="com.shsxt.xmjf.api.service.IAccountService" ref="busAccountServiceImpl"></dubbo:service>
 </beans>

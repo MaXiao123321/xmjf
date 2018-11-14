@@ -9,6 +9,7 @@
     <script type="text/javascript" src="${ctx}/js/assets/jquery-3.1.0.min.js"></script>
     <script type="text/javascript" src="${ctx}/js/common.js"></script>
     <script type="text/javascript" src="${ctx}/js/layer/layer.js"></script>
+    <script type="text/javascript" src="${ctx}/js/gt.js"></script>
     <script type="text/javascript">
         var ctx="${ctx}";
     </script>
@@ -28,10 +29,15 @@
             <div class="box-input">
                 <div class="box-input-center">
                     <p class="login_input_wrap"><input placeholder="手机号" type="text" id="phone" class="login-input1" /></p>
-                    <p class="login_input_code">
+                    <#--<p class="login_input_code">
                         <input name="code" placeholder="请输入验证码" type="text"  class="login-input login-check-code"/>
                         <img class="validImg" alt="点击更换" title="点击更换" src="${ctx}/image"/>
-                    </p>
+                    </p>-->
+                    <div>
+                        <div id="captcha2">
+                            <p id="wait2" class="show">正在加载验证码......</p>
+                        </div>
+                    </div>
                     <p class="login_input_password">
                         <input type="text" id="verification" placeholder="请输入验证码" class="login-input-verification"/>
                         <input type="button" id="clickMes" class="obtain" value="获取验证码"/>

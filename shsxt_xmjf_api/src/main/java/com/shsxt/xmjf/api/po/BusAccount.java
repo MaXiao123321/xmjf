@@ -1,8 +1,10 @@
 package com.shsxt.xmjf.api.po;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class BusAccount {
+public class BusAccount implements Serializable {
+    private static final long serialVersionUID = -3770571168662509701L;
     private Integer id;
 
     private Integer userId;

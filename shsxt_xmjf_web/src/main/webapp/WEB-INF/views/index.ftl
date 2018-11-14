@@ -24,17 +24,17 @@
         </a>
         <div class="header_nav" id="indexNav">
             <a href="${ctx}/index?0?0" class="header_nav_active">首页</a>
-            <a href="${ctx}/basItem/basItemListPage">我要投资</a>
+            <a href="${ctx}/item/index">我要投资</a>
             <a href="${ctx}/security?0?2">安全保障</a>
             <a href="${ctx}/account/accountInfo">我的账户</a>
             <a href="${ctx}/introduce?0?4">关于我们</a>
         </div>
         <div class="header_button">
-        <#if user??>
+        <#if userInfo??>
             <div id="hasUserId">
 
                 <div class='btn login' style="margin:36px auto 0; width: 164px;border:1px solid #fff;background: transparent">
-                    <p>${user.mobile}<img style="margin:15px 0 0 5px;" src="/img/xl-icon.png" alt=""></p>
+                    <p>${userInfo.mobile}<img style="margin:15px 0 0 5px;" src="/img/xl-icon.png" alt=""></p>
                 </div>
                 <div id="option" class="option display">
                     <div class="option-message">
@@ -47,7 +47,7 @@
                         <a class="selected3" href="${ctx}/user/inviteCode?5?3" style="cursor:pointer;">邀请好友</a>
                     </div>
                     <div class="option-two">
-                        <a class="selected4" href="${ctx}/user/exit" id="exit" style="cursor:pointer;">我要退出</a>
+                        <a class="selected4" href="${ctx}/exit" id="exit" style="cursor:pointer;">我要退出</a>
                     </div>
                 </div>
             </div>

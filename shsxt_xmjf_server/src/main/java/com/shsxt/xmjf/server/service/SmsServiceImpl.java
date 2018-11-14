@@ -57,6 +57,8 @@ public class SmsServiceImpl implements ISmsService {
         }else if(type==XmjfConstant.SMS_REGISTER_TYPE){
             AssertUtil.isTrue(null!=userService.queryBasUserByPhone(phone),"该手机号已注册");
             doSendSms(phone,XmjfConstant.SMS_REGISTER_CODE,code);
+        }else if(type==XmjfConstant.SMS_REGISTER_SUCCESS_NOTIFY_TYPE){
+            doSendSms(phone,XmjfConstant.SMS_REGISTER_SUCCESS_NOTIFY_CODE,code);
         }else{
             System.out.println("类型不合法!!!");
             return;

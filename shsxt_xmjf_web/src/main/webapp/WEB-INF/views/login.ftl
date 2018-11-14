@@ -9,6 +9,7 @@
     <script type="text/javascript" src="${ctx}/js/assets/jquery-3.1.0.min.js"></script>
     <script type="text/javascript" src="${ctx}/js/layer/layer.js"></script>
     <script type="text/javascript" src="${ctx}/js/common.js"></script>
+    <script src="${ctx}/js/gt.js"></script>
     <script type="text/javascript">
         var ctx="${ctx}";
     </script>
@@ -34,6 +35,7 @@
                         <input id="password" placeholder="请输入密码" type="password" class="login-input"/>
                     </p>
                 </div>
+
                 <div class="forget-passwrod">
                     <div class="forget-passwrod-center">
                         <a href="${ctx}/forgetPassword" style="cursor: pointer;color: #ff5e5e;float: left;font-size: 16px">忘记密码？</a>

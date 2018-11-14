@@ -7,6 +7,17 @@ public class ResultInfo implements Serializable{
     private Integer code=200;
     private String msg="操作成功";
 
+    public ResultInfo() {
+    }
+
+    public ResultInfo(Integer code) {
+        this.code = code;
+    }
+
+    public ResultInfo(String msg) {
+        this.msg = msg;
+    }
+
     public Integer getCode() {
         return code;
     }
