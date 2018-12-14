@@ -37,6 +37,7 @@ public class AccountController extends BaseController {
     @RequestMapping("index")
     @RequireLogin
     public  String index(){
+        System.out.println("Test");
         return "account_info";
     }
 
