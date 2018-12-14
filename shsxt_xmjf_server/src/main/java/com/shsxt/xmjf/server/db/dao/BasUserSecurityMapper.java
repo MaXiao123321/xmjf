@@ -5,4 +5,7 @@ import com.shsxt.xmjf.server.base.BaseMapper;
 
 public interface BasUserSecurityMapper extends BaseMapper<BasUserSecurity> {
 
+    public BasUserSecurity queryBasUserSecurityByUserId(Integer userId);
+
+
 }

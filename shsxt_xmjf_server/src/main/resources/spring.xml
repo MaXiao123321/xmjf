@@ -6,16 +6,19 @@
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
        xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans.xsd
-    http://www.springframework.org/schema/context
-    http://www.springframework.org/schema/context/spring-context.xsd
-    http://www.springframework.org/schema/aop
-    http://www.springframework.org/schema/aop/spring-aop.xsd
-    http://www.springframework.org/schema/tx
-    http://www.springframework.org/schema/tx/spring-tx.xsd
-    http://code.alibabatech.com/schema/dubbo
-    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/rabbit
+	    http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
 
     <context:component-scan base-package="com.shsxt.xmjf.server"/>
 
@@ -118,7 +121,40 @@
         </property>
     </bean>
 
+    <!--
+       rabbitMq 环境配置
+    -->
+    <!--
+       1.连接工厂
+          port  host   vs  username    password
+       2.交换机 topic
+           配置绑定的队列
+       3.声明队列
+       4.配置监听
+          配置监听队列的bean 对象
+       5.amqpTemplate
+   -->
+    <!--连接工厂-->
+    <rabbit:connection-factory id="connectionFactory" username="shsxt" password="123" host="127.0.0.1" port="5672" virtual-host="/test01"></rabbit:connection-factory>
+    <rabbit:admin connection-factory="connectionFactory"></rabbit:admin>
+    
+    <!--交换机-->
+    <rabbit:topic-exchange name="xmjf_exchange">
+        <rabbit:bindings>
+            <rabbit:binding pattern="sms.#" queue="xmjf_sms"></rabbit:binding>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
 
+    <!--声明队列-->
+    <rabbit:queue name="xmjf_sms"></rabbit:queue>
+
+    <!--配置监听-->
+    <rabbit:listener-container connection-factory="connectionFactory">
+        <rabbit:listener ref="messageServiceImpl" method="doSendSms" queue-names="xmjf_sms"></rabbit:listener>
+    </rabbit:listener-container>
+
+    <!--配置模板类-->
+    <rabbit:template connection-factory="connectionFactory" id="rabbitTemplate" exchange="xmjf_exchange" routing-key="sms.sendSms"></rabbit:template>
 
     <!--
        dubbo 环境配置
@@ -133,4 +169,9 @@
     <dubbo:service interface="com.shsxt.xmjf.api.service.ISmsService" ref="smsServiceImpl"></dubbo:service>
     <dubbo:service interface="com.shsxt.xmjf.api.service.IBasItemService" ref="basItemServiceImpl"></dubbo:service>
     <dubbo:service interface="com.shsxt.xmjf.api.service.IAccountService" ref="busAccountServiceImpl"></dubbo:service>
+    <dubbo:service interface="com.shsxt.xmjf.api.service.IBasUserSecurityService" ref="basUserSecurityServiceImpl"></dubbo:service>
+    <dubbo:service interface="com.shsxt.xmjf.api.service.IBusItemLoanService" ref="busItemLoanServiceImpl"></dubbo:service>
+    <dubbo:service interface="com.shsxt.xmjf.api.service.ISysPictureService" ref="sysPictureServiceImpl"></dubbo:service>
+    <dubbo:service interface="com.shsxt.xmjf.api.service.IBusItemInvestService" ref="busItemInvestServiceImpl"></dubbo:service>
+    <dubbo:service interface="com.shsxt.xmjf.api.service.IBusAccountRechargeService" ref="busAccountRechargeServiceImpl"></dubbo:service>
 </beans>

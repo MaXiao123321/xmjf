@@ -10,23 +10,13 @@
   <sql id="Base_Column_List" >
     id, user_id, total, usable
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="queryById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from bus_user_integral
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from bus_user_integral
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
   <insert id="insert" parameterType="com.shsxt.xmjf.api.po.BusUserIntegral" >
-    insert into bus_user_integral (id, user_id, total, 
-      usable)
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{total,jdbcType=INTEGER}, 
-      #{usable,jdbcType=INTEGER})
-  </insert>
-  <insert id="insertSelective" parameterType="com.shsxt.xmjf.api.po.BusUserIntegral" >
     insert into bus_user_integral
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -57,7 +47,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.shsxt.xmjf.api.po.BusUserIntegral" >
+  <update id="update" parameterType="com.shsxt.xmjf.api.po.BusUserIntegral" >
     update bus_user_integral
     <set >
       <if test="userId != null" >
@@ -72,11 +62,11 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.shsxt.xmjf.api.po.BusUserIntegral" >
-    update bus_user_integral
-    set user_id = #{userId,jdbcType=INTEGER},
-      total = #{total,jdbcType=INTEGER},
-      usable = #{usable,jdbcType=INTEGER}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
+  <select id="queryBusUserIntegralByUserId" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from bus_user_integral
+    where user_id=#{userId}
+  </select>
+
 </mapper>

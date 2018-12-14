@@ -31,6 +31,6 @@
         </javaClientGenerator>
 
 
-        <table tableName="bas_item" domainObjectName="BasItem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+        <table tableName="bus_integral_log" domainObjectName="BusIntegralLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
     </context>
 </generatorConfiguration>

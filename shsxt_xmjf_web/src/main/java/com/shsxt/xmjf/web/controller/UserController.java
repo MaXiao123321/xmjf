@@ -6,6 +6,7 @@ import com.shsxt.xmjf.api.model.ResultInfo;
 import com.shsxt.xmjf.api.model.UserModel;
 import com.shsxt.xmjf.api.po.User;
 import com.shsxt.xmjf.api.service.IUserService;
+import com.shsxt.xmjf.web.aop.annotations.RequireLogin;
 import org.apache.zookeeper.server.SessionTracker;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -83,5 +84,15 @@ public class UserController {
         }
         return resultInfo;
     }
+
+
+    @RequestMapping("user/auth")
+    @ResponseBody
+    @RequireLogin
+    public ResultInfo userAuth(String realName,String cardNo,String busiPassword,HttpSession session){
+        UserModel userModel = (UserModel) session.getAttribute(XmjfConstant.SESSION_USER);
+        return userService.updateBasUserSecurityInfo(realName,cardNo,userModel.getUserId(),busiPassword);
+    }
+
 
 }

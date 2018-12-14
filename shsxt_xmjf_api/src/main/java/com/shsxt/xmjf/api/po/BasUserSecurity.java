@@ -1,8 +1,10 @@
 package com.shsxt.xmjf.api.po;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class BasUserSecurity {
+public class BasUserSecurity implements Serializable{
+    private static final long serialVersionUID = -8352273383473807566L;
     private Integer id;
 
     private Integer userId;

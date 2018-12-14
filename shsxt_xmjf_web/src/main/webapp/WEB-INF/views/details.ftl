@@ -95,7 +95,7 @@
                                  <em id="minInvestMoney" data-value=${item.itemSingleMinInvestment}>
                                    ${item.itemSingleMinInvestment}元
                               <#else >
-                                 <em >
+                                 <em id="minInvestMoney">
                                  无
                             </#if>
                    </em>
@@ -107,7 +107,7 @@
                         <!--freemater取值时后面加个?c表示按数字取值-->
                             ${item.itemSingleMaxInvestment?c}元
                         <#else>
-                            <em >
+                            <em id="maxInvestMoney">
                                无限制
                         </#if>
                     </em>
@@ -141,9 +141,9 @@
             </table>
         </div>
         <div class="invest_panel">
-            <p class="text">剩余金额：${item.itemAccount-item.itemOngoingAccount}元</p>
+            <p class="text" id="syAmount" data-value="${(item.itemAccount-item.itemOngoingAccount)?c}">剩余金额：${item.itemAccount-item.itemOngoingAccount}元</p>
              <#if userInfo??>
-                 <p class="text left_account"><span id="ye" data-value=${account.usable?c}>账户余额：${account.usable}元</span>
+                 <p class="text left_account"><span id="usable" data-value=${account.usable?c}>账户余额：${account.usable}元</span>
                  <a class="charge" href="javascript:toRecharge()">充值</a>
                  </p>
              </#if>
@@ -151,7 +151,7 @@
             <p class="input_wrap left_account"><input type="text" id='usableMoney' placeholder="请输入投资金额"></p>
 
             <p class="input_wrap clear" style="margin-top:-12px;">
-                <#if  user??>
+                <#if  userInfo??>
                      <#if item.itemStatus ==1>
                          <a href="javascript:void(0)"><input class='invest_button fl' style="background: #c9c9c9;cursor: default" type="button"  value="即将开放"></a>
                         <#elseif  item.itemStatus==10>
@@ -213,84 +213,20 @@
                   </tr>
 
                   </tbody>
-                    <#--
-                       type==2
-                    <thead>
-                    <tr><th colspan="2">借款人信息</th><th colspan="2">保障措施</th></tr>
-                    </thead>
-                    <tbody>
-                    <tr><td>借&nbsp;款&nbsp;方</td><td>${security.realname}</td><td>1</td><td>汽车经销商/汽车零配件加工企业收入</td></tr>
-                    <tr><td>注册资金</td><td>${carMall.registerCapital}</td><td>2</td><td>逾期抵（质）押物变现</td></tr>
-                    <tr><td>注册地址</td><td>${carMall.address}</td><td>3</td><td>第三方机构担保逾期全额赔付 </td></tr>
-                    <tr><td>法人</td><td>${carMall.juridicalPersonName}</td><td>4</td><td>第三方机构贷中监管</td></tr>
-                    <tr><td>身份证号</td><td>${carMall.juridicalPersonCard}</td><td>5</td><td>专业团队催收</td></tr>
-                    <tr><td>资金用途</td><td>${item.itemLoanUse}</td><td>6</td><td>第三方催收公司逾期债权收购</td></tr>
-                    </tbody>-->
-
-                    <#--
-                      type==1
-                    <thead>
-                    <tr><th colspan="2">借款人信息</th><th colspan="2">保障措施</th></tr>
-                    </thead>
-                    <tbody>
-                    <tr><td>姓&nbsp;&nbsp;&nbsp;&nbsp;名</td><td>${trainingInformation.name}</td><td>1</td><td>第三方合作机构担保</td></tr>
-                    <tr><td>学&nbsp;&nbsp;&nbsp;&nbsp;校</td><td>${trainingInformation.school}</td><td>2</td><td>借款信息真实、透明、公开</td></tr>
-                    <tr><td>年&nbsp;&nbsp;&nbsp;&nbsp;级</td><td>${trainingInformation.grade}</td><td>3</td><td>驾校承担监管责任</td></tr>
-                    <tr><td>借款金额</td><td>${item.itemAccount}</td><td>4</td><td>专款专用避免挪用</td></tr>
-                    <tr><td>培训驾校</td><td>${trainingInformation.drivingSchool}</td><td>5</td><td>专业团队催收</td></tr>
-                    <tr><td>资金用途</td><td>大学生驾校培训费</td><td>6</td><td>担保机构无条件垫付代偿</td></tr>
-                    </tbody>-->
-                 <#--
-                   type==5
-                 <thead>
-                  <tr><th colspan="2">借款人信息</th><th colspan="2">车辆信息</th></tr>
-                  </thead>
-
-                          <tbody>
-                          <tr><td>姓&nbsp;&nbsp;&nbsp;&nbsp;名</td><td>${security.realname!''}</td><td>车型</td><td>${itemLoan.carType!''}</td></tr>
-                          <tr><td>身份证号</td><td>${security.identifyCard!''}</td><td>上牌时间</td><td><#if itemLoan.licensingTime??>${itemLoan.licensingTime?string("yyyy-MM")}</#if></td></tr>
-                          <tr><td>居&nbsp;住&nbsp;地</td><td>${info.currentAddress!''}</td><td>公里数</td><td>${itemLoan.kilometers!'0'}万公里</td></tr>
-                          <tr><td>首付金额</td><td><#if itemLoan.firstPayAmount??>${itemLoan.firstPayAmount!''}元</#if></td><td>评估价</td><td><#if itemLoan.assessPrice??>${itemLoan.assessPrice?number}元</#if></td></tr>
-
-                      </tbody>-->
-                    <#--
-                      其他情况
-                    <thead>
-                    <tr><th colspan="2">借款人信息</th><th colspan="2">车辆信息</th></tr>
-                    </thead>
-                  <#if itemLoan??>
-                       <#if itemLoan.isNewCar=='0'>
-                        <tbody>
-                        <tr><td>姓&nbsp;&nbsp;&nbsp;&nbsp;名</td><td>${security.realname!''}</td><td>车型</td><td>${itemLoan.carType!''}</td></tr>
-                        <tr><td>身份证号</td><td>${security.identifyCard!''}</td><td>上牌时间</td><td><#if itemLoan.licensingTime??>${itemLoan.licensingTime?string("yyyy-MM")}</#if></td></tr>
-                        <tr><td>出&nbsp;生&nbsp;地</td><td>${info.birthAddress!''}</td><td>公里数</td><td>${itemLoan.kilometers!'0'}万公里</td></tr>
-                        <tr><td>居&nbsp;住&nbsp;地</td><td>${info.currentAddress!''}</td><td>评估价</td><td><#if itemLoan.assessPrice??>${itemLoan.assessPrice?number}元</#if></td></tr>
-                        </tbody>
-                        <#else>
-                            <tbody>
-                            <tr><td>姓&nbsp;&nbsp;&nbsp;&nbsp;名</td><td>${security.realname!''}</td><td>品牌</td><td>${itemLoan.carBrand!''}</td></tr>
-                            <tr><td>身份证号</td><td>${security.identifyCard!''}</td><td>车型</td><td>${itemLoan.carType!''}</td></tr>
-                            <tr><td>出&nbsp;生&nbsp;地</td><td>${info.birthAddress!''}</td><td>购买价格</td><td>${itemLoan.buyPrice!''}</td></tr>
-                            </tbody>
-                        </#if>-->
                 </table>
             </div>
             <h3 class="title" id="anquanshenheType">安全审核</h3>
             <ul class="security_check clear">
                <if pics??>
                   <#list pics as pic>
-                        <#if pic.itemPictureType==1>
+                        <#if pic['type']==1>
                             <li style="background-image: url(/img/shenfenzheng.png)">身份证</li>
-                          <#elseif pic.itemPictureType==2>
+                          <#elseif pic['type']==2>
                               <li style="background-image: url(/img/xue.png)">学生证</li>
                         </#if>
                   </#list>
 
                </if>
-
-              <#--  <li style="background-image: url(/img/cheng.png)">车城外观</li>
-                <li style="background-image: url(/img/cheng.png)">车城外观</li>-->
-
 
             </ul>
 
@@ -311,7 +247,7 @@
                     <ul class="lunbo" id="slider">
                         <#if pics??>
                             <#list pics as pic>
-                                <li style="background-image: url(${pic.picturePath})" onclick="picTab()" data-url="${pic.picturePath}" ></li>
+                                <li style="background-image: url(${pic['url']})" onclick="picTab()" data-url="${pic['url']}" ></li>
                             </#list>
                         </#if>
 

@@ -6,6 +6,7 @@ import com.shsxt.xmjf.api.model.ResultInfo;
 import com.shsxt.xmjf.api.model.UserModel;
 import com.shsxt.xmjf.api.po.User;
 import com.shsxt.xmjf.api.service.IUserService;
+import com.shsxt.xmjf.web.aop.annotations.RequireLogin;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Controller
-public class UserControllero2 {
+public class UserControllero2 extends BaseController {
 
     @Resource
     private IUserService userService;
@@ -82,6 +83,31 @@ public class UserControllero2 {
         session.removeAttribute(XmjfConstant.SESSION_USER);
         //重定向到登录页面
         response.sendRedirect("login");
+    }
+
+
+    @RequestMapping("user/auth")
+    @ResponseBody
+    @RequireLogin
+    public ResultInfo userAuth(String realName,String cardNo,String busiPassword,HttpSession session){
+        UserModel userModel = (UserModel) session.getAttribute(XmjfConstant.SESSION_USER);
+        return userService.updateBasUserSecurityInfo(realName,cardNo,userModel.getUserId(),busiPassword);
+    }
+
+
+    @RequestMapping("user/checkRealNameStatus")
+    @ResponseBody
+    @RequireLogin
+    public ResultInfo checkRealNameStatus(HttpSession session){
+        UserModel userModel = (UserModel) session.getAttribute(XmjfConstant.SESSION_USER);
+        return userService.checkRealNameStatus(userModel.getUserId());
+    }
+
+
+    @RequestMapping("auth")
+    @RequireLogin
+    public String toAuth(){
+        return "auth";
     }
 
 }

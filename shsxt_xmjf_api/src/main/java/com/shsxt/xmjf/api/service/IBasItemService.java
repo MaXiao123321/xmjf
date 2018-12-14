@@ -13,4 +13,6 @@ public interface IBasItemService {
     public void updateBasItemStatusToOpen(Integer itemId);
 
     public BasItem queryBasItemByItemId(Integer itemId);
+
+    public  int update(BasItem basItem);
 }

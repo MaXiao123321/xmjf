@@ -2,17 +2,22 @@ package com.shsxt.xmjf.server.service;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.shsxt.xmjf.api.constants.XmjfConstant;
+import com.shsxt.xmjf.api.exceptions.BusiException;
+import com.shsxt.xmjf.api.model.ResultInfo;
 import com.shsxt.xmjf.api.model.UserModel;
 import com.shsxt.xmjf.api.po.*;
+import com.shsxt.xmjf.api.service.IBasUserSecurityService;
 import com.shsxt.xmjf.api.service.IUserService;
-import com.shsxt.xmjf.api.utils.AssertUtil;
-import com.shsxt.xmjf.api.utils.MD5;
-import com.shsxt.xmjf.api.utils.PhoneUtil;
-import com.shsxt.xmjf.api.utils.RandomCodesUtils;
+import com.shsxt.xmjf.api.utils.*;
 import com.shsxt.xmjf.server.base.BaseMapper;
 import com.shsxt.xmjf.server.db.dao.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -20,6 +25,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -50,6 +57,13 @@ public class UserServiceImpl implements IUserService {
 
     @Resource
     private BusAccountMapper busAccountMapper;
+
+
+    @Resource
+    private IBasUserSecurityService basUserSecurityService;
+
+    @Resource
+    private AmqpTemplate amqpTemplate;
 
     /*@Override
     public User queryUserByUserId(Integer userId) {
@@ -161,6 +175,14 @@ public class UserServiceImpl implements IUserService {
         //2-8 sys_log     系统日志
         initSysLog(userId);
 
+        //发送短信
+        //异步消息,短信异步发送
+        Map<String,Object> map=new HashMap<>();
+        map.put("phone",phone);
+        map.put("type",XmjfConstant.SMS_REGISTER_SUCCESS_NOTIFY_TYPE);
+        amqpTemplate.convertAndSend(map);
+
+
     }
 
     /**
@@ -200,6 +222,7 @@ public class UserServiceImpl implements IUserService {
 
         return userModel;
     }
+
 
     private void initSysLog(int userId) {
         SysLog sysLog = new SysLog();
@@ -296,4 +319,118 @@ public class UserServiceImpl implements IUserService {
         AssertUtil.isTrue(!(redisTemplate.hasKey(key)),"验证码不存在或已过期!");
         AssertUtil.isTrue(!(redisTemplate.opsForValue().get(key).toString().equals(code)),"验证码不正确");
     }
+
+
+    //用户实名认证
+    @Override
+    public ResultInfo updateBasUserSecurityInfo(String realName, String cardNo, Integer userId, String busiPassword) {
+        //调用阿里云认证接口
+        ResultInfo resultInfo = new ResultInfo();
+        try {
+            //验证参数
+            checkParams02(realName, cardNo,busiPassword);
+            BasUserSecurity basUserSecurity = basUserSecurityService.queryBasUserSecurityByUserId(userId);
+            AssertUtil.isTrue(basUserSecurity.getRealnameStatus()==1,"当前用户已实名");
+            doAuth(realName, cardNo);
+            basUserSecurity.setIdentifyCard(cardNo);
+            basUserSecurity.setRealname(realName);
+            basUserSecurity.setRealnameStatus(1);
+            basUserSecurity.setVerifyTime(new Date());
+            basUserSecurity.setPaymentPassword(MD5.toMD5(busiPassword));
+            AssertUtil.isTrue(basUserSecurityService.updateBasUserSecurity(basUserSecurity)<1,XmjfConstant.OPS_FAILED_MSG);
+        }catch (BusiException e) {
+            e.printStackTrace();
+            resultInfo.setCode(e.getCode());
+            resultInfo.setMsg(e.getMsg());
+        }catch (Exception e) {
+            e.printStackTrace();
+            resultInfo.setCode(XmjfConstant.OPS_FAILED_CODE);
+            resultInfo.setMsg("认证未通过!");
+        }
+
+        return resultInfo;
+    }
+
+    @Override
+    public ResultInfo checkRealNameStatus(Integer userId) {
+        BasUserSecurity basUserSecurity = basUserSecurityService.queryBasUserSecurityByUserId(userId);
+        ResultInfo resultInfo = new ResultInfo("已实名");
+        if(basUserSecurity.getRealnameStatus()!=1){
+            resultInfo.setCode(XmjfConstant.OPS_FAILED_CODE);
+            resultInfo.setMsg("用户未实名");
+        }
+        return resultInfo;
+    }
+
+    @Override
+    public BasUser queryBasUserByUserId(Integer userId) {
+        return basUserMapper.queryById(userId);
+    }
+
+    /**
+     * 调用阿里云的接口
+     * @param realName 客户的真是姓名
+     * @param cardNo 客户的身份证号码
+     */
+    private void doAuth(String realName, String cardNo) throws  Exception{
+            String host = XmjfConstant.SM_HOST;
+            String path = XmjfConstant.SM_PATH;
+            String method = XmjfConstant.SM_REQUEST_TYPE;
+            String appcode = XmjfConstant.SM_CODE;
+            Map<String, String> headers = new HashMap<String, String>();
+            //最后在header中的格式(中间是英文空格)为Authorization:APPCODE 83359fd73fe94948385f570e3c139105
+            headers.put("Authorization", "APPCODE " + appcode);
+            //根据API的要求，定义相对应的Content-Type
+            headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            Map<String, String> querys = new HashMap<String, String>();
+            Map<String, String> bodys = new HashMap<String, String>();
+            bodys.put("cardNo", cardNo);
+            bodys.put("realName", realName);
+
+
+            HttpResponse response = HttpUtils.doPost(host, path, method, headers, querys, bodys);
+            System.out.println(response.toString());
+
+            JSONObject jsonObject = JSON.parseObject(EntityUtils.toString(response.getEntity()));
+            System.out.println(response.getEntity());
+            AssertUtil.isTrue(jsonObject.getInteger("error_code")!=0,jsonObject.getString("reason"));
+
+    }
+
+    private void checkParams02(String realName, String cardNo, String busiPassword) {
+        AssertUtil.isTrue(StringUtils.isBlank(realName), "请输入真实姓名!");
+        AssertUtil.isTrue(StringUtils.isBlank(cardNo), "请输入身份证号!");
+        AssertUtil.isTrue(cardNo.length() != 18, "身份证号长度不合法!");
+        AssertUtil.isTrue(StringUtils.isBlank(busiPassword), "请输入交易密码!");
+    }
+
+    public static void main(String[] args) {
+        /*String host = "https://1.api.apistore.cn";
+        String path = "/idcard3";
+        String method = "POST";
+        String appcode = "a386f386635c4dc89638459e09469710";
+        Map<String, String> headers = new HashMap<String, String>();
+        //最后在header中的格式(中间是英文空格)为Authorization:APPCODE 83359fd73fe94948385f570e3c139105
+        headers.put("Authorization", "APPCODE " + appcode);
+        //根据API的要求，定义相对应的Content-Type
+        headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        Map<String, String> querys = new HashMap<String, String>();
+        Map<String, String> bodys = new HashMap<String, String>();
+        bodys.put("cardNo", "123");
+        bodys.put("realName", "张三");
+        try {
+            HttpResponse response = HttpUtils.doPost(host, path, method, headers, querys, bodys);
+            System.out.println(response.toString());
+
+            System.out.println(EntityUtils.toString(response.getEntity()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
+        String result = "{\"error_code\":80004,\"reason\":\"身份证号码格式不正确\",\"result\":{\"realName\":\"张三\",\"cardNo\":\"123\"},\"ordersign\":\"20181114171159073021025019\"}";
+        Object object= JSON.parse(result);
+        JSONObject jsonObject = JSON.parseObject(result);
+        System.out.println(jsonObject.getInteger("error_code") + "--" + jsonObject.getString("reason"));
+
+    }
+
 }

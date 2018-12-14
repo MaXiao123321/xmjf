@@ -108,4 +108,18 @@
     from bus_account
      where user_id=#{userId}
   </select>
+
+  <select id="countBusAccountInfoByUserId" parameterType="int" resultType="map">
+    SELECT
+      a.cash AS "可提现金额",
+      a.frozen AS "冻结金额",
+      a.repay "代还金额",
+      a.total "总资产",
+      a.usable "可用金额",
+      a.wait "代收本金",
+      bi.wait_income "代收利息"
+    FROM bus_account a LEFT JOIN bus_income_stat bi ON a.user_id=bi.user_id
+    WHERE a.user_id=#{userId}
+  </select>
+
 </mapper>

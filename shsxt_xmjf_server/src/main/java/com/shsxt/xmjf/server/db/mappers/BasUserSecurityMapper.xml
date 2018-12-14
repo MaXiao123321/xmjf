@@ -133,4 +133,11 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="queryBasUserSecurityByUserId" parameterType="int" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from bas_user_security
+    where user_id=#{userId}
+  </select>
+
 </mapper>

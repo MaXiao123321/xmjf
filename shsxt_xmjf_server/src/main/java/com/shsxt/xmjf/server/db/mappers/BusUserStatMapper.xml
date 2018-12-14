@@ -18,29 +18,14 @@
     id, user_id, recharge_count, recharge_amount, cash_count, cash_amount, invest_count, 
     invest_amount, invest_lave_amount, coupon_count, coupon_amount
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.shsxt.xmjf.api.po.BusUserStatKey" >
+  <select id="queryById" resultMap="BaseResultMap" parameterType="com.shsxt.xmjf.api.po.BusUserStatKey" >
     select 
     <include refid="Base_Column_List" />
     from bus_user_stat
     where id = #{id,jdbcType=INTEGER}
       and user_id = #{userId,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="com.shsxt.xmjf.api.po.BusUserStatKey" >
-    delete from bus_user_stat
-    where id = #{id,jdbcType=INTEGER}
-      and user_id = #{userId,jdbcType=INTEGER}
-  </delete>
   <insert id="insert" parameterType="com.shsxt.xmjf.api.po.BusUserStat" >
-    insert into bus_user_stat (id, user_id, recharge_count, 
-      recharge_amount, cash_count, cash_amount, 
-      invest_count, invest_amount, invest_lave_amount, 
-      coupon_count, coupon_amount)
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{rechargeCount,jdbcType=INTEGER}, 
-      #{rechargeAmount,jdbcType=DECIMAL}, #{cashCount,jdbcType=INTEGER}, #{cashAmount,jdbcType=DECIMAL}, 
-      #{investCount,jdbcType=INTEGER}, #{investAmount,jdbcType=DECIMAL}, #{investLaveAmount,jdbcType=DECIMAL}, 
-      #{couponCount,jdbcType=INTEGER}, #{couponAmount,jdbcType=DECIMAL})
-  </insert>
-  <insert id="insertSelective" parameterType="com.shsxt.xmjf.api.po.BusUserStat" >
     insert into bus_user_stat
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -113,7 +98,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.shsxt.xmjf.api.po.BusUserStat" >
+  <update id="update" parameterType="com.shsxt.xmjf.api.po.BusUserStat" >
     update bus_user_stat
     <set >
       <if test="rechargeCount != null" >
@@ -147,18 +132,11 @@
     where id = #{id,jdbcType=INTEGER}
       and user_id = #{userId,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.shsxt.xmjf.api.po.BusUserStat" >
-    update bus_user_stat
-    set recharge_count = #{rechargeCount,jdbcType=INTEGER},
-      recharge_amount = #{rechargeAmount,jdbcType=DECIMAL},
-      cash_count = #{cashCount,jdbcType=INTEGER},
-      cash_amount = #{cashAmount,jdbcType=DECIMAL},
-      invest_count = #{investCount,jdbcType=INTEGER},
-      invest_amount = #{investAmount,jdbcType=DECIMAL},
-      invest_lave_amount = #{investLaveAmount,jdbcType=DECIMAL},
-      coupon_count = #{couponCount,jdbcType=INTEGER},
-      coupon_amount = #{couponAmount,jdbcType=DECIMAL}
-    where id = #{id,jdbcType=INTEGER}
-      and user_id = #{userId,jdbcType=INTEGER}
-  </update>
+
+  <select id="queryBusUserStatByUserId" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from bus_user_stat
+    where user_id=#{userId}
+  </select>
+
 </mapper>

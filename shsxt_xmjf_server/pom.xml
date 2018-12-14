@@ -64,6 +64,12 @@
             <version>4.1.19</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <version>1.6.5.RELEASE</version>
+        </dependency>
+
     </dependencies>
 
     <build>

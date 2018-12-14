@@ -11,23 +11,13 @@
   <sql id="Base_Column_List" >
     id, user_id, total_income, wait_income, earned_income
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="queryById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from bus_income_stat
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from bus_income_stat
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
   <insert id="insert" parameterType="com.shsxt.xmjf.api.po.BusIncomeStat" >
-    insert into bus_income_stat (id, user_id, total_income, 
-      wait_income, earned_income)
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{totalIncome,jdbcType=DECIMAL}, 
-      #{waitIncome,jdbcType=DECIMAL}, #{earnedIncome,jdbcType=DECIMAL})
-  </insert>
-  <insert id="insertSelective" parameterType="com.shsxt.xmjf.api.po.BusIncomeStat" >
     insert into bus_income_stat
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -64,7 +54,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.shsxt.xmjf.api.po.BusIncomeStat" >
+  <update id="update" parameterType="com.shsxt.xmjf.api.po.BusIncomeStat" >
     update bus_income_stat
     <set >
       <if test="userId != null" >
@@ -82,12 +72,11 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.shsxt.xmjf.api.po.BusIncomeStat" >
-    update bus_income_stat
-    set user_id = #{userId,jdbcType=INTEGER},
-      total_income = #{totalIncome,jdbcType=DECIMAL},
-      wait_income = #{waitIncome,jdbcType=DECIMAL},
-      earned_income = #{earnedIncome,jdbcType=DECIMAL}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
+  <select id="queryBusIncomeStatByUserId" parameterType="int" resultMap="BaseResultMap">
+    SELECT  <include refid="Base_Column_List"/>
+    from bus_income_stat
+    where user_id=#{userId}
+  </select>
+
 </mapper>

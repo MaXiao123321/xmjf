@@ -54,20 +54,29 @@ public class SmsServiceImpl implements ISmsService {
         String code = RandomCodesUtils.createRandom(true, 6);
         if(type==XmjfConstant.SMS_LOGIN_TYPE){
             doSendSms(phone,XmjfConstant.SMS_LOGIN_CODE,code);
+            // 加入redis 缓存  失效时间180秒
+            // key  value
+            String key="phone::"+phone+"::type::"+type;
+            redisTemplate.opsForValue().set(key,code,180, TimeUnit.SECONDS);
         }else if(type==XmjfConstant.SMS_REGISTER_TYPE){
             AssertUtil.isTrue(null!=userService.queryBasUserByPhone(phone),"该手机号已注册");
             doSendSms(phone,XmjfConstant.SMS_REGISTER_CODE,code);
+            // 加入redis 缓存  失效时间180秒
+            // key  value
+            String key="phone::"+phone+"::type::"+type;
+            redisTemplate.opsForValue().set(key,code,180, TimeUnit.SECONDS);
         }else if(type==XmjfConstant.SMS_REGISTER_SUCCESS_NOTIFY_TYPE){
             doSendSms(phone,XmjfConstant.SMS_REGISTER_SUCCESS_NOTIFY_CODE,code);
+        }else if(type==XmjfConstant.SMS_RECHARGE_SUCCESS_NOTIFY_TYPE){
+            doSendSms(phone,XmjfConstant.SMS_RECHARGE_SUCCESS_NOTIFY_CODE,phone);
+        }else if(type==XmjfConstant.SMS_INVEST_SUCCESS_NOTIFY_TYPE){
+            doSendSms(phone,XmjfConstant.SMS_INVEST_SUCCESS_NOTIFY_CODE,phone);
         }else{
             System.out.println("类型不合法!!!");
             return;
         }
 
-        // 加入redis 缓存  失效时间180秒
-        // key  value
-        String key="phone::"+phone+"::type::"+type;
-        redisTemplate.opsForValue().set(key,code,180, TimeUnit.SECONDS);
+
 
     }
 
@@ -109,7 +118,7 @@ public class SmsServiceImpl implements ISmsService {
     private void checkParams(String phone, Integer type) {
         AssertUtil.isTrue(StringUtils.isBlank(phone), "请输入手机号");
         AssertUtil.isTrue(!PhoneUtil.checkPhone(phone), "手机号不合法");
-        AssertUtil.isTrue(null == type || !(type == XmjfConstant.SMS_LOGIN_TYPE || type == XmjfConstant.SMS_REGISTER_TYPE), "短信类型不合法");
+        AssertUtil.isTrue(null==type||!(type== XmjfConstant.SMS_LOGIN_TYPE||type==XmjfConstant.SMS_REGISTER_TYPE||type==XmjfConstant.SMS_REGISTER_SUCCESS_NOTIFY_TYPE||type==XmjfConstant.SMS_RECHARGE_SUCCESS_NOTIFY_TYPE||type==XmjfConstant.SMS_INVEST_SUCCESS_NOTIFY_TYPE),"短信类型不合法!");
     }
 
 }
