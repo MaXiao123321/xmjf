@@ -45,6 +45,7 @@ public class AccountController extends BaseController {
     @RequestMapping("recharge")
     @RequireLogin
     public String recharge(){
+        System.out.println("Test");
         return "recharge";
     }
 
